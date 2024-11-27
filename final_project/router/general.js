@@ -3,6 +3,7 @@ let books = require("./booksdb.js");
 let isValid = require("./auth_users.js").isValid;
 let users = require("./auth_users.js").users;
 const public_users = express.Router();
+const axios = require('axios');
 
 // Check if a user with the given username already exists
 const doesExist = (username) => {
@@ -37,11 +38,20 @@ public_users.post("/register", (req, res) => {
     return res.status(404).json({message: "Unable to register user."});
 });
 
+function getBooks() {
+    return new Promise((resolve, reject) => {
+        // Simulate an asynchronous operation, e.g., database call
+        setTimeout(() => {
+            resolve(books);
+        }, 100);
+    });
+}
+
 // Get the book list available in the shop
-public_users.get('/',function (req, res) {
+public_users.get('/', async(req, res) => {
   //Write your code here
-  res.send(JSON.stringify(books,null,4));
-  // return res.status(300).json({message: "Yet to be implemented"});
+    const books = await getBooks()
+    res.send(JSON.stringify(books,null,4));
 });
 
 // Get book details based on ISBN
