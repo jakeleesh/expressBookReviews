@@ -50,8 +50,59 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const isbn = req.params.isbn;
+    const username = req.session.username; // Assuming session contains the username
+    const { review } = req.body;
+
+    // Check if the book exists
+    if (!books[isbn]) {
+        return res.status(404).send('Book not found');
+    }
+
+    // Validate the review content
+    if (!review) {
+        return res.status(400).send('Review content is required');
+    }
+
+    // Retrieve the reviews for the book
+    const reviews = books[isbn].reviews;
+
+    // Find the review by the current user
+    const userReview = reviews.find(r => r.username === username);
+
+    // Check if the review exists
+    if (!userReview) {
+        return res.status(404).send('Review not found');
+    }
+
+    // Update the review content
+    userReview.review = review;
+    res.send('Review updated successfully');
+});
+
+regd_users.delete('/auth/review/:isbn', (req, res) => {
+    const isbn = req.params.isbn;
+    const username = req.session.username; // Assuming session contains the username
+
+    // Check if the book exists
+    if (!books[isbn]) {
+        return res.status(404).send('Book not found');
+    }
+
+    // Retrieve the reviews for the book
+    const reviews = books[isbn].reviews;
+
+    // Find the index of the review by the current user
+    const reviewIndex = reviews.findIndex(review => review.username === username);
+
+    // Check if the review exists and the user is authorized to delete it
+    if (reviewIndex === -1) {
+        return res.status(403).send('Review not found or not authorized to delete');
+    }
+
+    // Remove the review from the array
+    reviews.splice(reviewIndex, 1);
+    res.send('Review deleted successfully');
 });
 
 module.exports.authenticated = regd_users;
