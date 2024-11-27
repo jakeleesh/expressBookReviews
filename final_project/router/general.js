@@ -47,11 +47,29 @@ function getBooks() {
     });
 }
 
-async function fetchBookDetails(isbn) {
+async function fetchBookDetailsIsbn(isbn) {
     return new Promise((resolve, reject) => {
         // Simulate an asynchronous operation, e.g., database call
         setTimeout(() => {
             resolve(books[isbn]);
+        }, 100);
+    });
+}
+
+async function fetchBookDetailsAuthor(author) {
+    return new Promise((resolve, reject) => {
+        // Simulate an asynchronous operation, e.g., database call
+        setTimeout(() => {
+            const bookKeys = Object.keys(books);
+            const booksByAuthor = [];
+
+            bookKeys.forEach(key => {
+                const book = books[key];
+                if (book.author === author) {
+                    booksByAuthor.push(book);
+                }
+            });
+            resolve(booksByAuthor);
         }, 100);
     });
 }
@@ -67,24 +85,16 @@ public_users.get('/', async(req, res) => {
 public_users.get('/isbn/:isbn',async (req, res) => {
   //Write your code here
   const isbn = req.params.isbn;
-  const book = await fetchBookDetails(isbn)
+  const book = await fetchBookDetailsIsbn(isbn)
   res.send(book)
   // return res.status(300).json({message: "Yet to be implemented"});
  });
   
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
+public_users.get('/author/:author',async (req, res) => {
   //Write your code here
     const author = req.params.author;
-    const bookKeys = Object.keys(books);
-    const booksByAuthor = [];
-
-    bookKeys.forEach(key => {
-        const book = books[key];
-        if (book.author === author) {
-            booksByAuthor.push(book);
-        }
-    });
+    const booksByAuthor = await fetchBookDetailsAuthor(author);
 
     if (booksByAuthor.length > 0) {
         res.json(booksByAuthor);
