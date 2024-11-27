@@ -47,6 +47,15 @@ function getBooks() {
     });
 }
 
+async function fetchBookDetails(isbn) {
+    return new Promise((resolve, reject) => {
+        // Simulate an asynchronous operation, e.g., database call
+        setTimeout(() => {
+            resolve(books[isbn]);
+        }, 100);
+    });
+}
+
 // Get the book list available in the shop
 public_users.get('/', async(req, res) => {
   //Write your code here
@@ -55,10 +64,11 @@ public_users.get('/', async(req, res) => {
 });
 
 // Get book details based on ISBN
-public_users.get('/isbn/:isbn',function (req, res) {
+public_users.get('/isbn/:isbn',async (req, res) => {
   //Write your code here
   const isbn = req.params.isbn;
-  res.send(books[isbn])
+  const book = await fetchBookDetails(isbn)
+  res.send(book)
   // return res.status(300).json({message: "Yet to be implemented"});
  });
   
