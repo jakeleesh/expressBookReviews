@@ -74,6 +74,24 @@ async function fetchBookDetailsAuthor(author) {
     });
 }
 
+async function fetchBookDetailsTitle(title) {
+    return new Promise((resolve, reject) => {
+        // Simulate an asynchronous operation, e.g., database call
+        setTimeout(() => {
+            const bookKeys = Object.keys(books);
+            const booksByTitle = [];
+
+            bookKeys.forEach(key => {
+                const book = books[key];
+                if (book.title === title) {
+                    booksByTitle.push(book);
+                }
+            });
+            resolve(booksByTitle);
+        }, 100);
+    });
+}
+
 // Get the book list available in the shop
 public_users.get('/', async(req, res) => {
   //Write your code here
@@ -105,18 +123,10 @@ public_users.get('/author/:author',async (req, res) => {
 });
 
 // Get all books based on title
-public_users.get('/title/:title',function (req, res) {
+public_users.get('/title/:title',async (req, res) => {
   //Write your code here
     const title = req.params.title;
-    const bookKeys = Object.keys(books);
-    const booksByTitle = [];
-
-    bookKeys.forEach(key => {
-        const book = books[key];
-        if (book.title === title) {
-            booksByTitle.push(book);
-        }
-    });
+    const booksByTitle = await fetchBookDetailsTitle(title)
 
     if (booksByTitle.length > 0) {
         res.json(booksByTitle);
